@@ -1,4 +1,4 @@
-#pragma aonce
+#pragma once
 
 #include <common.h>
 

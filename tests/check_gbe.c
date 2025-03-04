@@ -1,17 +1,17 @@
 #include <check.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <emu.h>
 
 #include <cpu.h>
 
-START_TEST(test_nothing){
+START_TEST(test_nothing) {
     bool b = cpu_step();
-    ck_assert_uint_eq(b, true);
+    ck_assert_uint_eq(b, false);
 } END_TEST
 
-Suite *stack_suite(){
-    Suite* s = suite_create("emu");
+Suite *stack_suite() {
+    Suite *s = suite_create("emu");
     TCase *tc = tcase_create("core");
 
     tcase_add_test(tc, test_nothing);
@@ -20,14 +20,14 @@ Suite *stack_suite(){
     return s;
 }
 
-int main(){
+int main() {
     Suite *s = stack_suite();
     SRunner *sr = srunner_create(s);
-
     srunner_run_all(sr, CK_NORMAL);
     int nf = srunner_ntests_failed(sr);
 
     srunner_free(sr);
 
-    return nf == 0 ? 0 : 1;
+    return nf == 0 ? 0 : -1;
 }
+

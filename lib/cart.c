@@ -15,6 +15,7 @@ static const char *ROM_TYPES[] = {
     "MBC1+RAM",
     "MBC1+RAM+BATTERY",
     "0x04 ???",
+    "MBC2",
     "MBC2+BATTERY",
     "0x07 ???",
     "ROM+RAM 1",
@@ -101,26 +102,26 @@ static const char *LIC_CODE[0xA5] = {
     [0x86] = "Tokuma Shoten Intermedia",
     [0x87] = "Tsukuda Original",
     [0x91] = "Chunsoft",
-    [0x92] = "Video System",
+    [0x92] = "Video system",
     [0x93] = "Ocean/Acclaim",
     [0x95] = "Varie",
-    [0x96] = "Yonezawa/s'pal",
+    [0x96] = "Yonezawa/s’pal",
     [0x97] = "Kaneko",
     [0x99] = "Pack in soft",
-    [0xA4] = "Konami (Yu-Gi-Oh!)",	
+    [0xA4] = "Konami (Yu-Gi-Oh!)"
 };
 
-const char *cart_type_name(){
-    if(ctx.header->type <= 0x22){
-        return ROM_TYPES[ctx.header->type];
+const char *cart_lic_name() {
+    if (ctx.header->new_lic_code <= 0xA4) {
+        return LIC_CODE[ctx.header->lic_code];
     }
 
     return "UNKNOWN";
 }
 
-const char *cart_lic_name(){
-    if(ctx.header->new_lic_code <= 0xA4){
-        return LIC_CODE[ctx.header->new_lic_code];
+const char *cart_type_name() {
+    if (ctx.header->type <= 0x22) {
+        return ROM_TYPES[ctx.header->type];
     }
 
     return "UNKNOWN";
@@ -131,8 +132,8 @@ bool cart_load(char *cart) {
 
     FILE *fp = fopen(cart, "r");
 
-    if(!fp){
-        printf("Failed to open file: %s\n", cart);
+    if (!fp) {
+        printf("Failed to open: %s\n", cart);
         return false;
     }
 
@@ -151,20 +152,19 @@ bool cart_load(char *cart) {
     ctx.header->title[15] = 0;
 
     printf("Cartridge Loaded:\n");
-    printf("\t Title: %s\n", ctx.header->title);
-    printf("\t Type: %2.2X (%s)\n", ctx.header->type, cart_type_name());
-    printf("\t ROM Size: %d KB\n", 32 << ctx.header->rom_size);
-    printf("\t RAM Size: %2.2X\n", ctx.header->ram_size);
-    printf("\t LIC Code: %2.2X (%s)\n", ctx.header->new_lic_code, cart_lic_name());
-    printf("\t ROM Vers: %2.2X\n", ctx.header->version);
+    printf("\t Title    : %s\n", ctx.header->title);
+    printf("\t Type     : %2.2X (%s)\n", ctx.header->type, cart_type_name());
+    printf("\t ROM Size : %d KB\n", 32 << ctx.header->rom_size);
+    printf("\t RAM Size : %2.2X\n", ctx.header->ram_size);
+    printf("\t LIC Code : %2.2X (%s)\n", ctx.header->lic_code, cart_lic_name());
+    printf("\t ROM Vers : %2.2X\n", ctx.header->version);
 
     u16 x = 0;
-    for(u16 i = 0x0134; i <= 0x014C; i++){
+    for (u16 i=0x0134; i<=0x014C; i++) {
         x = x - ctx.rom_data[i] - 1;
     }
 
-    printf("\t Checksum: %2.2X (%s)\n", ctx.header->checksum, (x & 0xFF) ? "PASSED" : "FAILED");
+    printf("\t Checksum : %2.2X (%s)\n", ctx.header->checksum, (x & 0xFF) ? "PASSED" : "FAILED");
 
     return true;
-
 }
