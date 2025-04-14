@@ -1,4 +1,5 @@
 #include <bus.h>
+#include <cart.h>
 
 // 0x0000 - 0x3FFF : ROM Bank 0
 // 0x4000 - 0x7FFF : ROM Bank 1 - Switchable
@@ -16,8 +17,21 @@
 
 u8 bus_read(u16 address){
     if(address < 0x8000){
-        //return cart_read[address];
+        if(address < 0x8000){
+            // ROM Data
+            return cart_read(address);
+        }
     }
 
-    return 0;
+    NO_IMPL
+}
+
+void bus_write(u16 address, u8 value){
+    if(address < 0x8000){
+        // ROM Data
+        cart_write(address, value);
+        return;
+    }
+
+    NO_IMPL
 }
